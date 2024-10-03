@@ -6,11 +6,6 @@ import EditIcon from '@mui/icons-material/Edit';
 
 const App = () => {
  const [tasks, setTasks] = useState({
-    week1: [
-    { id: '1', content: 'Set up morning & evening skincare routine (Glow Up Your Looks)' },
-    { id: '2', content: 'Track expenses for the week (Glow Up Your Finances)' },
-    { id: '3', content: 'Meditate for 5 minutes each morning (Glow Up Your Mindset)' },
-  ],
   week1: [
     { id: '1', content: 'Set up morning & evening skincare routine (Glow Up Your Looks)' },
     { id: '2', content: 'Track expenses for the week (Glow Up Your Finances)' },
