@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { Button, TextField, Select, MenuItem, Container, Grid, Paper, IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 const App = () => {
-  const [tasks, setTasks] = useState({
+ const [tasks, setTasks] = useState({
   week1: [
     { id: '1', content: 'Set up morning & evening skincare routine (Glow Up Your Looks)' },
     { id: '2', content: 'Track expenses for the week (Glow Up Your Finances)' },
@@ -21,7 +24,6 @@ const App = () => {
     { id: '9', content: 'Finalize and create your vision board (Glow Up Your Mindset)' },
   ]
 });
-
   const [newTask, setNewTask] = useState('');
   const [selectedWeek, setSelectedWeek] = useState('week1');
   const [isEditing, setIsEditing] = useState(null);
@@ -60,80 +62,99 @@ const App = () => {
   };
 
   return (
-    <div>
+    <Container>
       <h1>Kanban Board</h1>
       
       {/* Task Creation Form */}
-      <input
-        type="text"
-        value={newTask}
-        onChange={(e) => setNewTask(e.target.value)}
-        placeholder="Add a new task"
-      />
-      <select value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)}>
-        <option value="week1">Week 1</option>
-        <option value="week2">Week 2</option>
-        <option value="week3">Week 3</option>
-        <option value="week4">Week 4</option>
-      </select>
-      <button onClick={addTask}>Add Task</button>
+      <Grid container spacing={2} alignItems="center" sx={{ mb: 3 }}>
+        <Grid item xs={8}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Add a new task"
+            value={newTask}
+            onChange={(e) => setNewTask(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <Select
+            fullWidth
+            value={selectedWeek}
+            onChange={(e) => setSelectedWeek(e.target.value)}
+          >
+            <MenuItem value="week1">Week 1</MenuItem>
+            <MenuItem value="week2">Week 2</MenuItem>
+            <MenuItem value="week3">Week 3</MenuItem>
+            <MenuItem value="week4">Week 4</MenuItem>
+          </Select>
+        </Grid>
+        <Grid item xs={1}>
+          <Button variant="contained" color="primary" onClick={addTask}>
+            Add
+          </Button>
+        </Grid>
+      </Grid>
 
       {/* Kanban Board */}
       <DragDropContext>
-        <div className="board">
+        <Grid container spacing={3}>
           {Object.keys(tasks).map((week, index) => (
-            <div key={index} className="column">
-              <h2>{`Week ${index + 1}`}</h2>
-              <Droppable droppableId={week}>
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef}>
-                    {tasks[week].map((task, taskIndex) => (
-                      <Draggable key={task.id} draggableId={task.id} index={taskIndex}>
-                        {(provided) => (
-                          <div
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            ref={provided.innerRef}
-                            className="task"
-                          >
-                            {isEditing === task.id ? (
+            <Grid item xs={12} md={3} key={index}>
+              <Paper elevation={3} sx={{ padding: 2 }}>
+                <h2>{`Week ${index + 1}`}</h2>
+                <Droppable droppableId={week}>
+                  {(provided) => (
+                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                      {tasks[week].map((task, taskIndex) => (
+                        <Draggable key={task.id} draggableId={task.id} index={taskIndex}>
+                          {(provided) => (
+                            <Paper
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              elevation={1}
+                              sx={{ mb: 2, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                            >
+                              {isEditing === task.id ? (
+                                <div>
+                                  <TextField
+                                    value={editContent}
+                                    onChange={(e) => setEditContent(e.target.value)}
+                                    variant="outlined"
+                                  />
+                                  <Button onClick={() => editTask(week, task.id)}>Save</Button>
+                                </div>
+                              ) : (
+                                <div>
+                                  <span>{task.content}</span>
+                                </div>
+                              )}
                               <div>
-                                <input
-                                  type="text"
-                                  value={editContent}
-                                  onChange={(e) => setEditContent(e.target.value)}
-                                />
-                                <button onClick={() => editTask(week, task.id)}>Save</button>
-                              </div>
-                            ) : (
-                              <div>
-                                <span>{task.content}</span>
-                                <button onClick={() => deleteTask(week, task.id)}>Delete</button>
-                                <button onClick={() => { 
+                                <IconButton onClick={() => deleteTask(week, task.id)} color="secondary">
+                                  <DeleteIcon />
+                                </IconButton>
+                                <IconButton onClick={() => { 
                                   setIsEditing(task.id);
                                   setEditContent(task.content);
-                                }}>Edit</button>
+                                }} color="primary">
+                                  <EditIcon />
+                                </IconButton>
                               </div>
-                            )}
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </div>
+                            </Paper>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </Paper>
+            </Grid>
           ))}
-        </div>
+        </Grid>
       </DragDropContext>
-    </div>
+    </Container>
   );
 };
 
 export default App;
-
-  
-
-
-  
