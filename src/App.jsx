@@ -5,35 +5,35 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
 const App = () => {
- const [tasks, setTasks] = useState({
-  week1: [
-    { id: '1', content: 'Set up morning & evening skincare routine (Glow Up Your Looks)' },
-    { id: '2', content: 'Track expenses for the week (Glow Up Your Finances)' },
-    { id: '3', content: 'Meditate for 5 minutes each morning (Glow Up Your Mindset)' },
-  ],
-  week2: [
-    { id: '4', content: 'Book a dental checkup (Glow Up Your Looks)' },
-    { id: '5', content: 'Increase cardio to 4 sessions this week (Glow Up Your Health)' },
-  ],
-  week3: [
-    { id: '6', content: 'Go through wardrobe, declutter (Glow Up Your Looks)' },
-    { id: '7', content: 'Explore side-hustle opportunities (Glow Up Your Finances)' },
-  ],
-  week4: [
-    { id: '8', content: 'Experiment with new hairstyles or makeup (Glow Up Your Looks)' },
-    { id: '9', content: 'Finalize and create your vision board (Glow Up Your Mindset)' },
-  ]
-});
+  const [tasks, setTasks] = useState({
+    week1: [
+      { id: '1', content: 'Set up morning & evening skincare routine (Glow Up Your Looks)' },
+      { id: '2', content: 'Track expenses for the week (Glow Up Your Finances)' },
+      { id: '3', content: 'Meditate for 5 minutes each morning (Glow Up Your Mindset)' },
+    ],
+    week2: [
+      { id: '4', content: 'Book a dental checkup (Glow Up Your Looks)' },
+      { id: '5', content: 'Increase cardio to 4 sessions this week (Glow Up Your Health)' },
+    ],
+    week3: [
+      { id: '6', content: 'Go through wardrobe, declutter (Glow Up Your Looks)' },
+      { id: '7', content: 'Explore side-hustle opportunities (Glow Up Your Finances)' },
+    ],
+    week4: [
+      { id: '8', content: 'Experiment with new hairstyles or makeup (Glow Up Your Looks)' },
+      { id: '9', content: 'Finalize and create your vision board (Glow Up Your Mindset)' },
+    ],
+  });
+
   const [newTask, setNewTask] = useState('');
   const [selectedWeek, setSelectedWeek] = useState('week1');
   const [isEditing, setIsEditing] = useState(null);
   const [editContent, setEditContent] = useState('');
 
-  // Function to add a task
   const addTask = () => {
     const taskId = Date.now().toString();
-    const newTaskObj = { id: taskId, content: newTask, category: 'Uncategorized' };
-    
+    const newTaskObj = { id: taskId, content: newTask };
+
     setTasks((prevTasks) => ({
       ...prevTasks,
       [selectedWeek]: [...prevTasks[selectedWeek], newTaskObj],
@@ -41,7 +41,6 @@ const App = () => {
     setNewTask('');
   };
 
-  // Function to delete a task
   const deleteTask = (week, id) => {
     setTasks((prevTasks) => ({
       ...prevTasks,
@@ -49,7 +48,6 @@ const App = () => {
     }));
   };
 
-  // Function to edit a task
   const editTask = (week, taskId) => {
     setTasks((prevTasks) => ({
       ...prevTasks,
@@ -61,11 +59,49 @@ const App = () => {
     setEditContent('');
   };
 
+  const onDragEnd = (result) => {
+    const { source, destination } = result;
+
+    // If no destination, exit
+    if (!destination) {
+      return;
+    }
+
+    // If the item was dropped in the same place
+    if (
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    ) {
+      return;
+    }
+
+    const sourceWeek = source.droppableId;
+    const destinationWeek = destination.droppableId;
+
+    const sourceTasks = Array.from(tasks[sourceWeek]);
+    const [removed] = sourceTasks.splice(source.index, 1);
+
+    if (sourceWeek === destinationWeek) {
+      sourceTasks.splice(destination.index, 0, removed);
+      setTasks((prevTasks) => ({
+        ...prevTasks,
+        [sourceWeek]: sourceTasks,
+      }));
+    } else {
+      const destinationTasks = Array.from(tasks[destinationWeek]);
+      destinationTasks.splice(destination.index, 0, removed);
+
+      setTasks((prevTasks) => ({
+        ...prevTasks,
+        [sourceWeek]: sourceTasks,
+        [destinationWeek]: destinationTasks,
+      }));
+    }
+  };
+
   return (
     <Container>
       <h1>My Kanban Board</h1>
-      
-      {/* Task Creation Form */}
       <Grid container spacing={2} alignItems="center" sx={{ mb: 3 }}>
         <Grid item xs={8}>
           <TextField
@@ -96,7 +132,7 @@ const App = () => {
       </Grid>
 
       {/* Kanban Board */}
-      <DragDropContext>
+      <DragDropContext onDragEnd={onDragEnd}>
         <Grid container spacing={3}>
           {Object.keys(tasks).map((week, index) => (
             <Grid item xs={12} md={3} key={index}>
@@ -104,7 +140,7 @@ const App = () => {
                 <h2>{`Week ${index + 1}`}</h2>
                 <Droppable droppableId={week}>
                   {(provided) => (
-                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                    <div {...provided.droppableProps} ref={provided.innerRef} style={{ minHeight: '100px' }}>
                       {tasks[week].map((task, taskIndex) => (
                         <Draggable key={task.id} draggableId={task.id} index={taskIndex}>
                           {(provided) => (
@@ -113,7 +149,7 @@ const App = () => {
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                               elevation={1}
-                              sx={{ mb: 2, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                              sx={{ mb: 2, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'grab' }}
                             >
                               {isEditing === task.id ? (
                                 <div>
