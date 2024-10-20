@@ -60,10 +60,13 @@ const App = () => {
   };
 
   const onDragEnd = (result) => {
+    console.log('Drag result:', result); // Log the drag result
+
     const { source, destination } = result;
 
     // If no destination, exit
     if (!destination) {
+      console.log('No destination!'); // Log no destination
       return;
     }
 
@@ -72,6 +75,7 @@ const App = () => {
       source.droppableId === destination.droppableId &&
       source.index === destination.index
     ) {
+      console.log('Dropped in the same place!'); // Log dropped in the same place
       return;
     }
 
@@ -138,9 +142,14 @@ const App = () => {
             <Grid item xs={12} md={3} key={index}>
               <Paper elevation={3} sx={{ padding: 2 }}>
                 <h2>{`Week ${index + 1}`}</h2>
+
                 <Droppable droppableId={week}>
                   {(provided) => (
-                    <div {...provided.droppableProps} ref={provided.innerRef} style={{ minHeight: '100px' }}>
+                    <div 
+                      {...provided.droppableProps} 
+                      ref={provided.innerRef} 
+                      style={{ minHeight: '100px', padding: '10px', backgroundColor: '#f7f7f7' }} // Added styles for visual clarity
+                    >
                       {tasks[week].map((task, taskIndex) => (
                         <Draggable key={task.id} draggableId={task.id} index={taskIndex}>
                           {(provided) => (
@@ -184,6 +193,7 @@ const App = () => {
                     </div>
                   )}
                 </Droppable>
+
               </Paper>
             </Grid>
           ))}
